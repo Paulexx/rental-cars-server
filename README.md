@@ -21,14 +21,14 @@ Installing environment (You need Java 8 to install):
 
 ## Server API
 
-`POST /car/cars/{id}` - return user by `id` in JSON format
+`POST /car/cars/id` - return user by `id` in JSON format
 
 `POST /car/cars` - return all users in JSON format
 
-`POST /order/orders/{id}` - return order by `id` in JSON format
+`POST /order/orders/id` - return order by `id` in JSON format
 
 `POST /order/orders` - return all orders in JSON format
 
-`POST /user/users/{id}` - return user by `id` in JSON format
+`POST /user/users/id` - return user by `id` in JSON format
 
 `POST /user/users` - return all users in JSON format
