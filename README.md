@@ -19,7 +19,7 @@ Installing environment (You need Java 8 to install):
 
 3. Copy file `rental-cars-server.war` from folder /build/libs/ to Tomcat's /webapps/.
 
-##Server API
+## Server API
 
 `POST /car/cars/{id}` - return user by `id` in JSON format
 
