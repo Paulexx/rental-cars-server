@@ -9,7 +9,7 @@ public class Car {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    public int carid;
+    public int id;
 
     @Column
     public String mark;
@@ -20,33 +20,36 @@ public class Car {
     @Column
     public int year;
 
-    @Column
-    public Date lastti;
+    @Column(name = "lastTI")
+    public Date lastTI;
 
-    @Column
-    public String gearboxtype;
+    @Column(name = "gearboxType")
+    public String gearboxType;
 
-    @Column
-    public int enginevolume;
+    @Column(name = "engineVolume")
+    public int engineVolume;
 
-    @Column
-    public String bodytype;
+    @Column(name = "bodyType")
+    public String bodyType;
 
     @Column
     public int capacity;
 
-    @Column
-    public int carryingcapacity;
+    @Column(name = "carryingCapacity")
+    public int carryingCapacity;
 
-    @Column
-    public float priceperhour;
+    @Column(name = "pricePerHour")
+    public float pricePerHour;
 
-    @Column
-    public float priceperday;
+    @Column(name = "pricePerDay")
+    public float pricePerDay;
 
     @Column
     public String type;
 
     @Column
     public String status;
+
+    @Column
+    public String image;
 }
