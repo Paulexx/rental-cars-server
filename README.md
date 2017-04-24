@@ -31,6 +31,12 @@ Installing environment (You need Java 8 to install):
 
 `GET /car/cars` - return all cars in JSON format
 
+`POST /order/add` - add order to database (accept data in JSON format)
+
+`PUT /order/edit` - edit order in database (accept data in JSON format)
+
+`DELETE /order/delete` - delete order from database (accept data in JSON format)
+
 `GET /order/orders/id` - return order by `id` in JSON format
 
 `GET /order/orders` - return all orders in JSON format
