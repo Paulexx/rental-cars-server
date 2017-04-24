@@ -35,6 +35,12 @@ Installing environment (You need Java 8 to install):
 
 `GET /order/orders` - return all orders in JSON format
 
+`POST /user/register` - add user to database (accept data in JSON format)
+
+`PUT /user/edit` - edit user in database (accept data in JSON format)
+
+`DELETE /user/delete` - delete user from database (accept data in JSON format)
+
 `GET /user/users/id` - return user by `id` in JSON format
 
 `GET /user/users` - return all users in JSON format
