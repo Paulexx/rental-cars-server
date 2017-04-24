@@ -27,7 +27,7 @@ public class Car {
     public String gearboxType;
 
     @Column(name = "engineVolume")
-    public int engineVolume;
+    public float engineVolume;
 
     @Column(name = "bodyType")
     public String bodyType;
