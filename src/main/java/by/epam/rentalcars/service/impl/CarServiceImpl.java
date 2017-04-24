@@ -15,6 +15,21 @@ public class CarServiceImpl implements CarService {
     private CarRepository carRepository;
 
     @Override
+    public Car add(Car car) {
+        return carRepository.save(car);
+    }
+
+    @Override
+    public Car edit(Car car) {
+        return carRepository.saveAndFlush(car);
+    }
+
+    @Override
+    public void delete(Car car) {
+        carRepository.delete(car);
+    }
+
+    @Override
     public Car findById(int id) {
         return carRepository.findOne(id);
     }
