@@ -26,7 +26,7 @@ public class CarController {
         return carService.findById(id);
     }
 
-    @RequestMapping("/cars/filter")
+    @RequestMapping("/filter")
     public List<Car> filterCars(@RequestBody Car car) {
         LOGGER.info("Filter cars");
         return carService.filterCars(car);

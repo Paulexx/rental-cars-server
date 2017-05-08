@@ -31,6 +31,8 @@ Installing environment (You need Java 8 to install):
 
 `GET /car/cars` - return all cars in JSON format
 
+`POST /car/filter` - return filtered cars JSON format (Filtered by @RequestBody "Car")
+
 `POST /order/add` - add order to database (accept data in JSON format)
 
 `PUT /order/edit` - edit order in database (accept data in JSON format)
