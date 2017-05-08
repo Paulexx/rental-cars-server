@@ -26,6 +26,30 @@ public class CarController {
         return carService.findById(id);
     }
 
+    @RequestMapping("/cars/filter")
+    public List<Car> filterCars(@RequestBody Car car) {
+        LOGGER.info("Filter cars");
+        return carService.filterCars(car);
+    }
+
+//    @RequestMapping("/cars/{mark}")
+//    public Car getCarByMark(@PathVariable("mark") String mark) {
+//        //LOGGER.info("Load car with mark = " + mark);
+//        return carService.findByMark(mark);
+//    }
+//
+//    @RequestMapping("/cars/{model}")
+//    public Car getCarByModel(@PathVariable("model") String model) {
+//        //LOGGER.info("Load car with mark = " + mark);
+//        return carService.findByModel(model);
+//    }
+//
+//    @RequestMapping("/cars/{year}")
+//    public Car getCarByYear(@PathVariable("year") int year) {
+//        //LOGGER.info("Load car with mark = " + mark);
+//        return carService.findByYear(year);
+//    }
+
     @RequestMapping("/cars")
     public List<Car> getAllCars() {
         LOGGER.info("Load all cars");

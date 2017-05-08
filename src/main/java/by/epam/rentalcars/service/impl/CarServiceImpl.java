@@ -35,6 +35,16 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
+    public List<Car> filterCars(Car car) {
+        return carRepository.filterCars(car.mark,
+                car.model, car.year, car.lastTI,
+                car.gearboxType, car.engineVolume,
+                car.bodyType, car.capacity,
+                car.carryingCapacity, car.pricePerHour,
+                car.pricePerDay, car.type);
+    }
+
+    @Override
     public List<Car> findAll() {
         return carRepository.findAll();
     }
