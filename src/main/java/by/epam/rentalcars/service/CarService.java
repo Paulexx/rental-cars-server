@@ -17,29 +17,5 @@ public interface CarService {
 
     List<Car> filterCars(Car car);
 
-//    Car findByMark(String mark);
-//
-//    Car findByModel(String model);
-//
-//    Car findByYear(int year);
-//
-//    Car findByLastTI(Date lastTI);
-//
-//    Car findByGearboxType(String gearboxType);
-//
-//    Car findByEngineVolume(float engineVolume);
-//
-//    Car findByBodyType(String bodyType);
-//
-//    Car findByCapacity(int capacity);
-//
-//    Car findByCarryingCapacity(int carryingCapacity);
-//
-//    Car findByPricePerHour(float pricePerHour);
-//
-//    Car findByPricePerDay(float pricePerDay);
-//
-//    Car findByType(String type);
-
     List<Car> findAll();
 }

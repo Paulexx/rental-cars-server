@@ -9,7 +9,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/car")
@@ -25,30 +29,6 @@ public class CarController {
         LOGGER.info("Load car with id = " + id);
         return carService.findById(id);
     }
-
-    @RequestMapping("/filter")
-    public List<Car> filterCars(@RequestBody Car car) {
-        LOGGER.info("Filter cars");
-        return carService.filterCars(car);
-    }
-
-//    @RequestMapping("/cars/{mark}")
-//    public Car getCarByMark(@PathVariable("mark") String mark) {
-//        //LOGGER.info("Load car with mark = " + mark);
-//        return carService.findByMark(mark);
-//    }
-//
-//    @RequestMapping("/cars/{model}")
-//    public Car getCarByModel(@PathVariable("model") String model) {
-//        //LOGGER.info("Load car with mark = " + mark);
-//        return carService.findByModel(model);
-//    }
-//
-//    @RequestMapping("/cars/{year}")
-//    public Car getCarByYear(@PathVariable("year") int year) {
-//        //LOGGER.info("Load car with mark = " + mark);
-//        return carService.findByYear(year);
-//    }
 
     @RequestMapping("/cars")
     public List<Car> getAllCars() {

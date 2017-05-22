@@ -8,8 +8,5 @@ import org.springframework.data.repository.query.Param;
 
 public interface UserRepository extends JpaRepository<User, Integer> {
 
-//    User findByFirstName(@Param("firstName") String firstName);
-//
-//    User findByFirstName(@Param("firstName") String firstName);
 
 }
