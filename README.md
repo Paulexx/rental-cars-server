@@ -52,3 +52,5 @@ Installing environment (You need Java 8 to install):
 `GET /user/users/id` - return user by `id` in JSON format
 
 `GET /user/users` - return all users in JSON format
+
+`POST /auth/login` - user authentication (accept data in JSON format), return JWT-token for user
