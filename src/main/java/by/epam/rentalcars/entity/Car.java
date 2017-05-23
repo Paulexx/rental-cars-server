@@ -52,4 +52,7 @@ public class Car {
 
     @Column
     public String image;
+
+    @Column(name = "registrationNumber")
+    public String registrationNumber;
 }
