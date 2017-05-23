@@ -34,11 +34,13 @@ public class AuthenticationController {
         LOGGER.info("Start authentication");
         if (isNotEmpty(requestUser.email) && isNotEmpty(requestUser.password)) {
             User user = userService.findByEmail(requestUser.email);
-            String token = tokenService.generateToken(user.email, requestUser.password);
-            if (token != null) {
-                LOGGER.info("Authentication successful! Returning token");
-                user.password = EMPTY;
-                return new ResponseEntity<>(new Token(token, user), HttpStatus.OK);
+            if (user != null) {
+                String token = tokenService.generateToken(user.email, requestUser.password);
+                if (token != null) {
+                    LOGGER.info("Authentication successful! Returning token");
+                    user.password = EMPTY;
+                    return new ResponseEntity<>(new Token(token, user), HttpStatus.OK);
+                }
             }
         }
         LOGGER.error("Authentication failed");
