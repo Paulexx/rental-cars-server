@@ -33,7 +33,7 @@ public class UserController {
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public ResponseEntity<User> add(@RequestBody User user) {
         LOGGER.info("Registering user");
-        if (userService.findById(user.id) == null) {
+        if (userService.findById(user.id) == null && userService.findByEmail(user.email) == null) {
             User addedUser = userService.add(user);
             if (addedUser != null) {
                 LOGGER.info("Registering user successful");
