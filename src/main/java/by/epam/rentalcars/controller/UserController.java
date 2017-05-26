@@ -9,7 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/user")
@@ -31,7 +33,7 @@ public class UserController {
     }
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
-    public ResponseEntity<User> add(@RequestBody User user) {
+    public ResponseEntity<Map<String, String>> add(@RequestBody User user) {
         LOGGER.info("Registering user");
         if (userService.findById(user.id) == null && userService.findByEmail(user.email) == null) {
             User addedUser = userService.add(user);
@@ -41,7 +43,9 @@ public class UserController {
             }
         }
         LOGGER.error("Registering user failed");
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        Map<String, String> errorMap = new HashMap<String, String>();
+        errorMap.put("errors", "Registration failed: user with email " + user.email + " already exists");
+        return new ResponseEntity<>(errorMap, HttpStatus.BAD_REQUEST);
     }
 
     @RequestMapping(value = "/edit", method = RequestMethod.PUT)
