@@ -32,13 +32,13 @@ public class AuthenticationController {
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public ResponseEntity<?> authenticate(@RequestBody User requestUser) {
         LOGGER.info("Start authentication");
-        if (isNotEmpty(requestUser.email) && isNotEmpty(requestUser.password)) {
+        if (isNotEmpty(requestUser.email) && isNotEmpty(requestUser.getPassword())) {
             User user = userService.findByEmail(requestUser.email);
             if (user != null) {
-                String token = tokenService.generateToken(user.email, requestUser.password);
+                String token = tokenService.generateToken(user.email, requestUser.getPassword());
                 if (token != null) {
                     LOGGER.info("Authentication successful! Returning token");
-                    user.password = EMPTY;
+                    user.setPassword(EMPTY);
                     return new ResponseEntity<>(new Token(token, user), HttpStatus.OK);
                 }
             }

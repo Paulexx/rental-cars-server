@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -36,6 +37,8 @@ public class UserController {
     public ResponseEntity<Map<String, String>> add(@RequestBody User user) {
         LOGGER.info("Registering user");
         if (userService.findById(user.id) == null && userService.findByEmail(user.email) == null) {
+            BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+            user.setPassword((passwordEncoder.encode(user.getPassword())));
             User addedUser = userService.add(user);
             if (addedUser != null) {
                 LOGGER.info("Registering user successful");
@@ -52,6 +55,8 @@ public class UserController {
     public ResponseEntity<User> edit(@RequestBody User user) {
         LOGGER.info("Editing user with id = " + user.id);
         if (userService.findById(user.id) != null) {
+            BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+            user.setPassword((passwordEncoder.encode(user.getPassword())));
             User editedUser = userService.edit(user);
             if (editedUser != null) {
                 LOGGER.info("Editing user with id = " + user.id + " successful");

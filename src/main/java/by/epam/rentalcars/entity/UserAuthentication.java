@@ -34,7 +34,7 @@ public class UserAuthentication implements Authentication {
 
     @Override
     public Object getCredentials() {
-        return user.password;
+        return user.getPassword();
     }
 
     @Override

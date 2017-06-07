@@ -8,6 +8,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -30,7 +31,8 @@ public class TokenServiceImpl implements TokenService {
             return null;
         User user = userService.findByEmail(email);
         Map<String, Object> tokenData = new HashMap<>();
-        if (user != null && password.equals(user.password)) {
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        if (user != null && passwordEncoder.matches(password, user.getPassword())) {
             tokenData.put("clientType", "user");
             tokenData.put("userID", user.id);
             tokenData.put("email", user.email);

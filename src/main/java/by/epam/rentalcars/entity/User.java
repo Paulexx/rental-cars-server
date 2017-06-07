@@ -20,7 +20,7 @@ public class User {
     public String lastName;
 
     @Column
-    public String password;
+    private String password;
 
     @Column(name = "passportId")
     public String passportId;
@@ -30,4 +30,12 @@ public class User {
 
     @Column
     public String phone;
+
+    public void setPassword(final String password) {
+        this.password = password;
+    }
+
+    public String getPassword() {
+        return password;
+    }
 }
