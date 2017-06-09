@@ -70,4 +70,9 @@ public class OrderController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
+    @RequestMapping("/history/{id}")
+    public List<Order> getAllOrders(@PathVariable("id") int id) {
+        return orderService.findOrdersByUserId(id);
+    }
+
 }
