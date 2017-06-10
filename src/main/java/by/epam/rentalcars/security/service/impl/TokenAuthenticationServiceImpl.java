@@ -16,6 +16,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.*;
 
 @Service
 public class TokenAuthenticationServiceImpl implements TokenAuthenticationService {
@@ -33,7 +34,7 @@ public class TokenAuthenticationServiceImpl implements TokenAuthenticationServic
     @Override
     public Authentication authenticate(HttpServletRequest request) {
         String token = request.getHeader(AUTH_HEADER_NAME);
-        LOGGER.info("Request token: "+token);
+        LOGGER.info("Request token: " + token);
         if (token != null) {
             final Jws<Claims> tokenData = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
             User user = getUserFromToken(tokenData);

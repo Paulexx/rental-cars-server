@@ -26,7 +26,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers("/", "user/register", "auth/login").permitAll()
+                .antMatchers(HttpMethod.OPTIONS,"/**").permitAll()
+                .antMatchers("/", "/user/register", "/auth/login").permitAll()
+                .antMatchers("/car/cars", "/car/cars/**").permitAll()
+                .antMatchers("/car/add", "/car/edit", "/car/delete").hasAuthority("ROLE_ADMIN")
+                .antMatchers("/order/orders", "/order/orders/**", "/order/history/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER")
+                .antMatchers("/order/add", "/order/edit").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER")
+                .antMatchers("/order/delete").hasAuthority("ROLE_ADMIN")
+                .antMatchers("/user/users").hasAuthority("ROLE_ADMIN")
+                .antMatchers("/user/users/**", "/user/edit").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER")
+                .antMatchers("/user/delete").hasAuthority("ROLE_ADMIN")
                 .and()
                 .addFilterBefore(new AuthenticationTokenFilter(tokenAuthenticationService), UsernamePasswordAuthenticationFilter.class)
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
