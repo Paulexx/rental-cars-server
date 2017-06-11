@@ -70,6 +70,19 @@ public class OrderController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
+    @RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE)
+    public ResponseEntity<Order> deleteById(@PathVariable int id) {
+        LOGGER.info("Deleting order with id = " + id);
+        Order foundOrder = orderService.findById(id);
+        if (foundOrder != null) {
+            orderService.delete(foundOrder);
+            LOGGER.info("Deleting order with id = " + id + " successful");
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        LOGGER.error("Deleting order with id = " + id + " failed");
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
     @RequestMapping("/history/{id}")
     public List<Order> getHistoryByUserId(@PathVariable("id") int id) {
         return orderService.findOrdersByUserId(id);

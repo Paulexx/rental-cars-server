@@ -79,4 +79,16 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
+    @RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE)
+    public ResponseEntity<User> deleteById(@PathVariable int id) {
+        LOGGER.info("Deleting user with id = " + id);
+        User foundUser = userService.findById(id);
+        if (foundUser != null) {
+            userService.delete(foundUser);
+            LOGGER.info("Deleting user with id = " + id + " successful");
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        LOGGER.error("Deleting user with id = " + id + " failed");
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
 }

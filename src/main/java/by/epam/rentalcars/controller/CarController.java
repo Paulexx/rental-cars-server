@@ -76,4 +76,16 @@ public class CarController {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
+    @RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE)
+    public ResponseEntity<Car> deleteById(@PathVariable int id) {
+        LOGGER.info("Deleting car with id = " + id);
+        Car foundCar = carService.findById(id);
+        if (foundCar != null) {
+            carService.delete(foundCar);
+            LOGGER.info("Deleting car with id = " + id + " successful");
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        LOGGER.error("Deleting car with id = " + id + " failed");
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
 }

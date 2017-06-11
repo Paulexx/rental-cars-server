@@ -27,6 +27,8 @@ Installing environment (You need Java 8 to install):
 
 `DELETE /car/delete` - delete car from database (accept data in JSON format)
 
+`DELETE /car/delete/id` - delete car by `id` from database
+
 `GET /car/cars/id` - return car by `id` in JSON format
 
 `GET /car/cars` - return all cars in JSON format
@@ -39,6 +41,8 @@ Installing environment (You need Java 8 to install):
 
 `DELETE /order/delete` - delete order from database (accept data in JSON format)
 
+`DELETE /order/delete/id` - delete order by `id` from database
+
 `GET /order/orders/id` - return order by `id` in JSON format
 
 `GET /order/orders` - return all orders in JSON format
@@ -48,6 +52,8 @@ Installing environment (You need Java 8 to install):
 `PUT /user/edit` - edit user in database (accept data in JSON format)
 
 `DELETE /user/delete` - delete user from database (accept data in JSON format)
+
+`DELETE /user/delete/id` - delete user by `id` from database
 
 `GET /user/users/id` - return user by `id` in JSON format
 
