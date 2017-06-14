@@ -1,6 +1,8 @@
 package by.epam.rentalcars.controller;
 
+import by.epam.rentalcars.entity.Car;
 import by.epam.rentalcars.entity.Order;
+import by.epam.rentalcars.service.CarService;
 import by.epam.rentalcars.service.OrderService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +20,9 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
 
+    @Autowired
+    private CarService carService;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(OrderController.class);
 
     @RequestMapping("/orders/{id}")
@@ -34,10 +39,15 @@ public class OrderController {
     public ResponseEntity<Order> add(@RequestBody Order order) {
         LOGGER.info("Adding order");
         if (orderService.findById(order.id) == null) {
-            Order addedOrder = orderService.add(order);
-            if (addedOrder != null) {
-                LOGGER.info("Adding order successful");
-                return new ResponseEntity<>(HttpStatus.OK);
+            Car findCar = carService.findById(order.carId);
+            if (findCar.status.equals("free")) {
+                Order addedOrder = orderService.add(order);
+                findCar.status = "ordered";
+                Car changedStatusCar = carService.edit(findCar);
+                if (addedOrder != null && changedStatusCar != null) {
+                    LOGGER.info("Adding order successful");
+                    return new ResponseEntity<>(HttpStatus.OK);
+                }
             }
         }
         LOGGER.error("Adding order failed");
