@@ -56,7 +56,12 @@ public class UserController {
         LOGGER.info("Editing user with id = " + user.id);
         if (userService.findById(user.id) != null) {
             BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-            user.setPassword((passwordEncoder.encode(user.getPassword())));
+            if (user.getPassword() == null || user.getPassword().equals("")) {
+                user.setPassword(userService.findById(user.id).getPassword());
+            }
+            else {
+                user.setPassword((passwordEncoder.encode(user.getPassword())));
+            }
             User editedUser = userService.edit(user);
             if (editedUser != null) {
                 LOGGER.info("Editing user with id = " + user.id + " successful");
