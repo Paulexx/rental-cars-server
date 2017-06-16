@@ -14,6 +14,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -55,12 +57,13 @@ public class UserController {
     public ResponseEntity<User> edit(@RequestBody User user) {
         LOGGER.info("Editing user with id = " + user.id);
         if (userService.findById(user.id) != null) {
+            user.email = userService.findById(user.id).email;
             BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-            if (user.getPassword() == null || user.getPassword().equals("")) {
+            if (!isNotEmpty(user.getPassword())) {
                 user.setPassword(userService.findById(user.id).getPassword());
             }
             else {
-                user.setPassword((passwordEncoder.encode(user.getPassword())));
+                user.setPassword(passwordEncoder.encode(user.getPassword()));
             }
             User editedUser = userService.edit(user);
             if (editedUser != null) {
