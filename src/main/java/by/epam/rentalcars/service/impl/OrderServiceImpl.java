@@ -4,9 +4,12 @@ import by.epam.rentalcars.entity.Order;
 import by.epam.rentalcars.repository.OrderRepository;
 import by.epam.rentalcars.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -42,5 +45,10 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<Order> findOrdersByUserId(int id) {
         return orderRepository.findOrdersByUserId(id);
+    }
+
+    @Override
+    public List<Order> findOrdersByCarId(int id) {
+        return orderRepository.findOrdersByCarId(id);
     }
 }

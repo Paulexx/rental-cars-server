@@ -9,11 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
+
+import static org.hibernate.annotations.common.util.StringHelper.isEmpty;
 
 @RestController
 @RequestMapping("/car")
@@ -54,6 +52,9 @@ public class CarController {
     public ResponseEntity<Car> edit(@RequestBody Car car) {
         LOGGER.info("Editing car with id = " + car.id);
         if (carService.findById(car.id) != null) {
+            if (isEmpty(car.image)) {
+                car.image = carService.findById(car.id).image;
+            }
             Car editedCar = carService.edit(car);
             if (editedCar != null) {
                 LOGGER.info("Editing car with id = " + car.id + " successful");

@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static org.hibernate.annotations.common.util.StringHelper.isEmpty;
 
 @RestController
 @RequestMapping("/user")
@@ -40,7 +40,7 @@ public class UserController {
         LOGGER.info("Registering user");
         if (userService.findById(user.id) == null && userService.findByEmail(user.email) == null) {
             BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-            user.setPassword((passwordEncoder.encode(user.getPassword())));
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
             User addedUser = userService.add(user);
             if (addedUser != null) {
                 LOGGER.info("Registering user successful");
@@ -59,10 +59,9 @@ public class UserController {
         if (userService.findById(user.id) != null) {
             user.email = userService.findById(user.id).email;
             BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-            if (!isNotEmpty(user.getPassword())) {
+            if (isEmpty(user.getPassword())) {
                 user.setPassword(userService.findById(user.id).getPassword());
-            }
-            else {
+            } else {
                 user.setPassword(passwordEncoder.encode(user.getPassword()));
             }
             User editedUser = userService.edit(user);
