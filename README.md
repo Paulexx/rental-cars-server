@@ -47,6 +47,10 @@ Installing environment (You need Java 8 to install):
 
 `GET /order/orders` - return all orders in JSON format
 
+`GET /order/history/id` - return order history by user `id` in JSON format
+
+`GET /order/freedates/id` - return free dates to order by car `id` in JSON format
+
 `POST /user/register` - add user to database (accept data in JSON format)
 
 `PUT /user/edit` - edit user in database (accept data in JSON format)

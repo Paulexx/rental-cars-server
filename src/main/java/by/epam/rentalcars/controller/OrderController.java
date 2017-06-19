@@ -9,9 +9,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @RestController
 @RequestMapping("/order")
@@ -38,16 +41,11 @@ public class OrderController {
     @RequestMapping(value = "/add", method = RequestMethod.POST)
     public ResponseEntity<Order> add(@RequestBody Order order) {
         LOGGER.info("Adding order");
-        if (orderService.findById(order.id) == null) {
-            Car findCar = carService.findById(order.carId);
-            if (findCar.status.equals("free")) {
-                Order addedOrder = orderService.add(order);
-                findCar.status = "ordered";
-                Car changedStatusCar = carService.edit(findCar);
-                if (addedOrder != null && changedStatusCar != null) {
-                    LOGGER.info("Adding order successful");
-                    return new ResponseEntity<>(HttpStatus.OK);
-                }
+        if (orderService.findById(order.id) == null && !isOverlapped(order.orderDateTime, order.returnDateTime, order.carId)) {
+            Order addedOrder = orderService.add(order);
+            if (addedOrder != null) {
+                LOGGER.info("Adding order successful");
+                return new ResponseEntity<>(HttpStatus.OK);
             }
         }
         LOGGER.error("Adding order failed");
@@ -57,7 +55,7 @@ public class OrderController {
     @RequestMapping(value = "/edit", method = RequestMethod.PUT)
     public ResponseEntity<Order> edit(@RequestBody Order order) {
         LOGGER.info("Editing order with id = " + order.id);
-        if (orderService.findById(order.id) != null) {
+        if (orderService.findById(order.id) == null && !isOverlapped(order.orderDateTime, order.returnDateTime, order.carId)) {
             Order editedOrder = orderService.edit(order);
             if (editedOrder != null) {
                 LOGGER.info("Editing order with id = " + order.id + " successful");
@@ -72,6 +70,8 @@ public class OrderController {
     public ResponseEntity<Order> delete(@RequestBody Order order) {
         LOGGER.info("Deleting order with id = " + order.id);
         if (orderService.findById(order.id) != null) {
+            Car findCar = carService.findById(order.carId);
+            findCar.status = "free";
             orderService.delete(order);
             LOGGER.info("Deleting order with id = " + order.id + " successful");
             return new ResponseEntity<>(HttpStatus.OK);
@@ -85,6 +85,8 @@ public class OrderController {
         LOGGER.info("Deleting order with id = " + id);
         Order foundOrder = orderService.findById(id);
         if (foundOrder != null) {
+            Car findCar = carService.findById(foundOrder.carId);
+            findCar.status = "free";
             orderService.delete(foundOrder);
             LOGGER.info("Deleting order with id = " + id + " successful");
             return new ResponseEntity<>(HttpStatus.OK);
@@ -98,4 +100,97 @@ public class OrderController {
         return orderService.findOrdersByUserId(id);
     }
 
+    public static ArrayList<Date> getDaysBetweenDates(Date startDate, Date endDate) {
+        ArrayList<Date> dates = new ArrayList<>();
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime(startDate);
+        while (calendar.getTime().before(endDate)) {
+            Date result = calendar.getTime();
+            dates.add(result);
+            calendar.add(Calendar.DATE, 1);
+        }
+        return dates;
+    }
+
+    @RequestMapping("/freedates/{id}")
+    public List<String> getFreeDatesByCarId(@PathVariable("id") int id) {
+        List<Order> orders = orderService.findOrdersByCarId(id);
+        Collections.sort(orders);
+        ArrayList<Date> freeDates = new ArrayList<>();
+        Calendar calStart = Calendar.getInstance();
+        calStart.set(Calendar.HOUR_OF_DAY, 0);
+        calStart.set(Calendar.MINUTE, 0);
+        calStart.set(Calendar.SECOND, 0);
+        calStart.set(Calendar.MILLISECOND, 0);
+        Calendar calEnd = Calendar.getInstance();
+        calEnd.setTime(orders.get(orders.size() - 1).returnDateTime);
+        DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+        ArrayList<String> stringDates = new ArrayList<>();
+        freeDates.addAll(getDaysBetweenDates(calStart.getTime(), calEnd.getTime()));
+        for (Order order : orders) {
+            if (order.orderStatus.equals("ordered")) {
+                freeDates.removeAll(getDaysBetweenDates(order.orderDateTime, order.returnDateTime));
+            }
+        }
+        Map<String, String> dateMap = new LinkedHashMap<String, String>();
+        for (int i = 0; i < freeDates.size(); i++) {
+            for (int j = i + 1; j < freeDates.size(); j++) {
+                int countOfDays = (int) ((freeDates.get(j).getTime() - freeDates.get(j - 1).getTime()) / (1000 * 60 * 60 * 24));
+                if (countOfDays != 1) {
+                    dateMap.put(dateFormat.format(freeDates.get(i)), dateFormat.format(freeDates.get(j - 1)));
+                    i = j - 1;
+                    break;
+                }
+                if (j == freeDates.size() - 1) {
+                    dateMap.put(dateFormat.format(freeDates.get(i)), dateFormat.format(freeDates.get(j)));
+                    i = j;
+                }
+            }
+        }
+        Collections.reverse(orders);
+        for (Order order : orders) {
+            if (order.orderStatus.equals("ordered")) {
+                dateMap.put(dateFormat.format(order.returnDateTime), "...");
+                break;
+            }
+        }
+        for (Map.Entry<String, String> date : dateMap.entrySet()) {
+            stringDates.add(date.getKey() + " - " + date.getValue());
+        }
+        return stringDates;
+    }
+
+    public boolean isOverlapped(Date startDate, Date endDate, int carId) {
+        for (Order order : orderService.findOrdersByCarId(carId)) {
+            if (startDate.before(order.returnDateTime) && order.orderDateTime.before(endDate) && order.orderStatus.equals("ordered")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Scheduled(fixedRate = 5000)
+    public void refreshOrdersStatus() {
+        Date date = new Date();
+        for (Order order : orderService.findAll()) {
+            Car findCar = carService.findById(order.carId);
+            if (date.after(order.orderDateTime) && date.before(order.returnDateTime) && !findCar.status.equals("ordered") && order.orderStatus.equals("ordered")) {
+                findCar.status = "ordered";
+                carService.edit(findCar);
+                LOGGER.info("Automatic ordered order with id = " + order.id);
+            }
+            if (date.after(order.returnDateTime) && order.orderStatus.equals("ordered")) {
+                order.orderStatus = "done";
+                orderService.edit(order);
+                findCar.status = "free";
+                carService.edit(findCar);
+                LOGGER.info("Automatic done order with id = " + order.id);
+            }
+            if (order.orderStatus.equals("canceled")) {
+                findCar.status = "free";
+                carService.edit(findCar);
+                LOGGER.info("Automatic cancel order with id = " + order.id);
+            }
+        }
+    }
 }

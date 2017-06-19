@@ -30,7 +30,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/", "/user/register", "/auth/login").permitAll()
                 .antMatchers("/car/cars", "/car/cars/**").permitAll()
                 .antMatchers("/car/add", "/car/edit", "/car/delete", "/car/delete/**").hasAuthority("ROLE_ADMIN")
-                .antMatchers("/order/orders", "/order/orders/**", "/order/history/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER")
+                .antMatchers("/order/orders", "/order/orders/**", "/order/history/**", "/order/freedates/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER")
                 .antMatchers("/order/add", "/order/edit").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER")
                 .antMatchers("/order/delete", "/order/delete/**").hasAuthority("ROLE_ADMIN")
                 .antMatchers("/user/users").hasAuthority("ROLE_ADMIN")

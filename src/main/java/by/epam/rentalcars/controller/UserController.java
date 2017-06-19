@@ -14,6 +14,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.hibernate.annotations.common.util.StringHelper.isEmpty;
+
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -38,7 +40,7 @@ public class UserController {
         LOGGER.info("Registering user");
         if (userService.findById(user.id) == null && userService.findByEmail(user.email) == null) {
             BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-            user.setPassword((passwordEncoder.encode(user.getPassword())));
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
             User addedUser = userService.add(user);
             if (addedUser != null) {
                 LOGGER.info("Registering user successful");
@@ -55,8 +57,13 @@ public class UserController {
     public ResponseEntity<User> edit(@RequestBody User user) {
         LOGGER.info("Editing user with id = " + user.id);
         if (userService.findById(user.id) != null) {
+            user.email = userService.findById(user.id).email;
             BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-            user.setPassword((passwordEncoder.encode(user.getPassword())));
+            if (isEmpty(user.getPassword())) {
+                user.setPassword(userService.findById(user.id).getPassword());
+            } else {
+                user.setPassword(passwordEncoder.encode(user.getPassword()));
+            }
             User editedUser = userService.edit(user);
             if (editedUser != null) {
                 LOGGER.info("Editing user with id = " + user.id + " successful");
