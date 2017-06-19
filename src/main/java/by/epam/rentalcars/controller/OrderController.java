@@ -12,8 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
-import java.util.List;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @RestController
 @RequestMapping("/order")
@@ -54,7 +55,7 @@ public class OrderController {
     @RequestMapping(value = "/edit", method = RequestMethod.PUT)
     public ResponseEntity<Order> edit(@RequestBody Order order) {
         LOGGER.info("Editing order with id = " + order.id);
-        if (orderService.findById(order.id) != null) {
+        if (orderService.findById(order.id) == null && !isOverlapped(order.orderDateTime, order.returnDateTime, order.carId)) {
             Order editedOrder = orderService.edit(order);
             if (editedOrder != null) {
                 LOGGER.info("Editing order with id = " + order.id + " successful");
@@ -97,6 +98,66 @@ public class OrderController {
     @RequestMapping("/history/{id}")
     public List<Order> getHistoryByUserId(@PathVariable("id") int id) {
         return orderService.findOrdersByUserId(id);
+    }
+
+    public static ArrayList<Date> getDaysBetweenDates(Date startDate, Date endDate) {
+        ArrayList<Date> dates = new ArrayList<>();
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime(startDate);
+        while (calendar.getTime().before(endDate)) {
+            Date result = calendar.getTime();
+            dates.add(result);
+            calendar.add(Calendar.DATE, 1);
+        }
+        return dates;
+    }
+
+    @RequestMapping("/freedates/{id}")
+    public List<String> getFreeDatesByCarId(@PathVariable("id") int id) {
+        List<Order> orders = orderService.findOrdersByCarId(id);
+        Collections.sort(orders);
+        ArrayList<Date> freeDates = new ArrayList<>();
+        Calendar calStart = Calendar.getInstance();
+        calStart.set(Calendar.HOUR_OF_DAY, 0);
+        calStart.set(Calendar.MINUTE, 0);
+        calStart.set(Calendar.SECOND, 0);
+        calStart.set(Calendar.MILLISECOND, 0);
+        Calendar calEnd = Calendar.getInstance();
+        calEnd.setTime(orders.get(orders.size() - 1).returnDateTime);
+        DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+        ArrayList<String> stringDates = new ArrayList<>();
+        freeDates.addAll(getDaysBetweenDates(calStart.getTime(), calEnd.getTime()));
+        for (Order order : orders) {
+            if (order.orderStatus.equals("ordered")) {
+                freeDates.removeAll(getDaysBetweenDates(order.orderDateTime, order.returnDateTime));
+            }
+        }
+        Map<String, String> dateMap = new LinkedHashMap<String, String>();
+        for (int i = 0; i < freeDates.size(); i++) {
+            for (int j = i + 1; j < freeDates.size(); j++) {
+                int countOfDays = (int) ((freeDates.get(j).getTime() - freeDates.get(j - 1).getTime()) / (1000 * 60 * 60 * 24));
+                if (countOfDays != 1) {
+                    dateMap.put(dateFormat.format(freeDates.get(i)), dateFormat.format(freeDates.get(j - 1)));
+                    i = j - 1;
+                    break;
+                }
+                if (j == freeDates.size() - 1) {
+                    dateMap.put(dateFormat.format(freeDates.get(i)), dateFormat.format(freeDates.get(j)));
+                    i = j;
+                }
+            }
+        }
+        Collections.reverse(orders);
+        for (Order order : orders) {
+            if (order.orderStatus.equals("ordered")) {
+                dateMap.put(dateFormat.format(order.returnDateTime), "...");
+                break;
+            }
+        }
+        for (Map.Entry<String, String> date : dateMap.entrySet()) {
+            stringDates.add(date.getKey() + " - " + date.getValue());
+        }
+        return stringDates;
     }
 
     public boolean isOverlapped(Date startDate, Date endDate, int carId) {
