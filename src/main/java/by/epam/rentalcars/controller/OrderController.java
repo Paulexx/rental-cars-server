@@ -113,51 +113,64 @@ public class OrderController {
     }
 
     @RequestMapping("/freedates/{id}")
-    public List<String> getFreeDatesByCarId(@PathVariable("id") int id) {
+    public List<Map.Entry<String,String>> getFreeDatesByCarId(@PathVariable("id") int id) {
         List<Order> orders = orderService.findOrdersByCarId(id);
         Collections.sort(orders);
         ArrayList<Date> freeDates = new ArrayList<>();
+        DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
         Calendar calStart = Calendar.getInstance();
         calStart.set(Calendar.HOUR_OF_DAY, 0);
         calStart.set(Calendar.MINUTE, 0);
         calStart.set(Calendar.SECOND, 0);
         calStart.set(Calendar.MILLISECOND, 0);
-        Calendar calEnd = Calendar.getInstance();
-        calEnd.setTime(orders.get(orders.size() - 1).returnDateTime);
-        DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
-        ArrayList<String> stringDates = new ArrayList<>();
-        freeDates.addAll(getDaysBetweenDates(calStart.getTime(), calEnd.getTime()));
-        for (Order order : orders) {
-            if (order.orderStatus.equals("ordered")) {
-                freeDates.removeAll(getDaysBetweenDates(order.orderDateTime, order.returnDateTime));
+        if (orders.size() != 0) {
+            Calendar calEnd = Calendar.getInstance();
+            calEnd.setTime(orders.get(orders.size() - 1).returnDateTime);
+            ArrayList<String> stringDates = new ArrayList<>();
+            freeDates.addAll(getDaysBetweenDates(calStart.getTime(), calEnd.getTime()));
+            for (Order order : orders) {
+                if (order.orderStatus.equals("ordered")) {
+                    freeDates.removeAll(getDaysBetweenDates(order.orderDateTime, order.returnDateTime));
+                }
             }
-        }
-        Map<String, String> dateMap = new LinkedHashMap<String, String>();
-        for (int i = 0; i < freeDates.size(); i++) {
-            for (int j = i + 1; j < freeDates.size(); j++) {
-                int countOfDays = (int) ((freeDates.get(j).getTime() - freeDates.get(j - 1).getTime()) / (1000 * 60 * 60 * 24));
-                if (countOfDays != 1) {
-                    dateMap.put(dateFormat.format(freeDates.get(i)), dateFormat.format(freeDates.get(j - 1)));
-                    i = j - 1;
+            Map<String, String> dateMap = new LinkedHashMap<String, String>();
+            for (int i = 0; i < freeDates.size(); i++) {
+                for (int j = i + 1; j < freeDates.size(); j++) {
+                    int countOfDays = (int) ((freeDates.get(j).getTime() - freeDates.get(j - 1).getTime()) / (1000 * 60 * 60 * 24));
+                    if (countOfDays != 1) {
+                        dateMap.put(dateFormat.format(freeDates.get(i)), dateFormat.format(freeDates.get(j - 1)));
+                        i = j - 1;
+                        break;
+                    }
+                    if (j == freeDates.size() - 1) {
+                        dateMap.put(dateFormat.format(freeDates.get(i)), dateFormat.format(freeDates.get(j)));
+                        i = j;
+                    }
+                }
+            }
+            Collections.reverse(orders);
+            for (Order order : orders) {
+                if (order.orderStatus.equals("ordered")) {
+                    dateMap.put(dateFormat.format(order.returnDateTime), "...");
                     break;
                 }
-                if (j == freeDates.size() - 1) {
-                    dateMap.put(dateFormat.format(freeDates.get(i)), dateFormat.format(freeDates.get(j)));
-                    i = j;
-                }
             }
-        }
-        Collections.reverse(orders);
-        for (Order order : orders) {
-            if (order.orderStatus.equals("ordered")) {
-                dateMap.put(dateFormat.format(order.returnDateTime), "...");
-                break;
+            for (Map.Entry<String, String> date : dateMap.entrySet()) {
+                stringDates.add(date.getKey() + " - " + date.getValue());
             }
+            List<Map.Entry<String, String>> dateJSON = new ArrayList<>();
+            for (String date : stringDates) {
+                Map.Entry<String, String> entry = new AbstractMap.SimpleEntry<String, String>("date", date);
+                dateJSON.add(entry);
+            }
+            return dateJSON;
         }
-        for (Map.Entry<String, String> date : dateMap.entrySet()) {
-            stringDates.add(date.getKey() + " - " + date.getValue());
+        else {
+            List<Map.Entry<String, String>> dateJSON = new ArrayList<>();
+            Map.Entry<String, String> entry = new AbstractMap.SimpleEntry<String, String>("date", dateFormat.format(calStart.getTime()) + " - ...");
+            dateJSON.add(entry);
+            return dateJSON;
         }
-        return stringDates;
     }
 
     public boolean isOverlapped(Date startDate, Date endDate, int carId) {
