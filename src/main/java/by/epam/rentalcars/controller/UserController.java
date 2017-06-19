@@ -58,6 +58,7 @@ public class UserController {
         LOGGER.info("Editing user with id = " + user.id);
         if (userService.findById(user.id) != null) {
             user.email = userService.findById(user.id).email;
+            user.admin = userService.findById(user.id).admin;
             BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
             if (isEmpty(user.getPassword())) {
                 user.setPassword(userService.findById(user.id).getPassword());
